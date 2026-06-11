@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Building Infrastructure Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1117;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #1a1d2e;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d2f3e;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #00d4ff;
+        }
+
+        .status-badge {
+            background: #00ff88;
+            color: #000;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 30px 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #1a1d2e;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2d2f3e;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: #8b8d9b;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-card .unit {
+            font-size: 13px;
+            color: #8b8d9b;
+            margin-top: 4px;
+        }
+
+        .buildings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .building-card {
+            background: #1a1d2e;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #2d2f3e;
+        }
+
+        .building-card h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .building-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff88;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .sensor-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #2d2f3e;
+        }
+
+        .sensor-row:last-child {
+            border-bottom: none;
+        }
+
+        .sensor-label {
+            font-size: 13px;
+            color: #8b8d9b;
+        }
+
+        .sensor-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .sensor-value.warning {
+            color: #ffaa00;
+        }
+
+        .sensor-value.danger {
+            color: #ff4444;
+        }
+
+        .sensor-value.good {
+            color: #00ff88;
+        }
+
+        .alerts-section {
+            background: #1a1d2e;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #2d2f3e;
+            margin-bottom: 30px;
+        }
+
+        .alerts-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .alert-item.warning {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            color: #ffaa00;
+        }
+
+        .alert-item.danger {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+        }
+
+        .alert-item.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+
+        .infrastructure-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .infra-card {
+            background: #1a1d2e;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2d2f3e;
+            text-align: center;
+        }
+
+        .infra-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .infra-card .name {
+            font-size: 14px;
+            color: #8b8d9b;
+            margin-bottom: 8px;
+        }
+
+        .infra-card .status {
+            font-size: 13px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: #8b8d9b;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏢 IoT Building Infrastructure Dashboard</h1>
+        <span class="status-badge">● All Systems Operational</span>
+    </header>
+
+    <div class="container">
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Total Buildings</div>
+                <div class="value">3</div>
+                <div class="unit">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Occupancy</div>
+                <div class="value" id="totalOccupancy">--</div>
+                <div class="unit">People</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Avg Temperature</div>
+                <div class="value" id="avgTemp">--</div>
+                <div class="unit">°Celsius</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Energy</div>
+                <div class="value" id="totalEnergy">--</div>
+                <div class="unit">kWh</div>
+            </div>
+        </div>
+
+        <!-- Building Cards -->
+        <h2 class="section-title">🏗️ Building Status</h2>
+        <div class="buildings-grid" id="buildingsGrid">
+            <!-- Buildings will be loaded here -->
+        </div>
+
+        <!-- Alerts -->
+        <div class="alerts-section">
+            <h2>🔔 Active Alerts</h2>
+            <div id="alertsList">
+                <!-- Alerts will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Infrastructure Status -->
+        <h2 class="section-title">☁️ Infrastructure Status</h2>
+        <div class="infrastructure-grid">
+            <div class="infra-card">
+                <div class="icon">☸️</div>
+                <div class="name">AKS Cluster</div>
+                <div class="status">● Running</div>
+            </div>
+            <div class="infra-card">
+                <div class="icon">📦</div>
+                <div class="name">Container Registry</div>
+                <div class="status">● Active</div>
+            </div>
+            <div class="infra-card">
+                <div class="icon">🔐</div>
+                <div class="name">Key Vault</div>
+                <div class="status">● Secured</div>
+            </div>
+            <div class="infra-card">
+                <div class="icon">📊</div>
+                <div class="name">Prometheus</div>
+                <div class="status">● Collecting</div>
+            </div>
+            <div class="infra-card">
+                <div class="icon">📈</div>
+                <div class="name">Grafana</div>
+                <div class="status">● Live</div>
+            </div>
+            <div class="infra-card">
+                <div class="icon">⏱️</div>
+                <div class="name">Uptime Kuma</div>
+                <div class="status">● Monitoring</div>
+            </div>
+        </div>
+
+        <div class="last-updated">Last updated: <span id="lastUpdated">--</span></div>
+
+    </div>
+
+    <script>
+        // Simulate building data
+        const buildings = [
+            { id: "building-001", name: "Tower A", floors: 10 },
+            { id: "building-002", name: "Tower B", floors: 8 },
+            { id: "building-003", name: "Tower C", floors: 15 }
+        ];
+
+        function generateData() {
+            return buildings.map(b => ({
+                ...b,
+                temperature: (Math.random() * 10 + 18).toFixed(1),
+                occupancy: Math.floor(Math.random() * b.floors * 20),
+                energy: (Math.random() * 400 + 100).toFixed(1),
+                aqi: Math.floor(Math.random() * 100),
+                unauthorized: Math.floor(Math.random() * 3)
+            }));
+        }
+
+        function updateDashboard() {
+            const data = generateData();
+            const alerts = [];
+
+            // Update stats
+            const totalOccupancy = data.reduce((a, b) => a + b.occupancy, 0);
+            const avgTemp = (data.reduce((a, b) => a + parseFloat(b.temperature), 0) / data.length).toFixed(1);
+            const totalEnergy = data.reduce((a, b) => a + parseFloat(b.energy), 0).toFixed(0);
+
+            document.getElementById('totalOccupancy').textContent = totalOccupancy;
+            document.getElementById('avgTemp').textContent = avgTemp;
+            document.getElementById('totalEnergy').textContent = totalEnergy;
+
+            // Update buildings
+            const grid = document.getElementById('buildingsGrid');
+            grid.innerHTML = data.map(b => {
+                const tempClass = b.temperature > 26 ? 'danger' : b.temperature > 24 ? 'warning' : 'good';
+                const aqiClass = b.aqi > 80 ? 'danger' : b.aqi > 50 ? 'warning' : 'good';
+
+                if (b.temperature > 26) alerts.push({ type: 'warning', msg: `🌡️ High Temperature: ${b.name} - ${b.temperature}°C` });
+                if (b.aqi > 80) alerts.push({ type: 'danger', msg: `😷 Poor Air Quality: ${b.name} - AQI ${b.aqi}` });
+                if (b.unauthorized > 0) alerts.push({ type: 'danger', msg: `🚨 Security Alert: ${b.name} - ${b.unauthorized} unauthorized attempt(s)` });
+
+                return `
+                    <div class="building-card">
+                        <h3><span class="building-status"></span>${b.name}</h3>
+                        <div class="sensor-row">
+                            <span class="sensor-label">🌡️ Temperature</span>
+                            <span class="sensor-value ${tempClass}">${b.temperature}°C</span>
+                        </div>
+                        <div class="sensor-row">
+                            <span class="sensor-label">👥 Occupancy</span>
+                            <span class="sensor-value good">${b.occupancy} people</span>
+                        </div>
+                        <div class="sensor-row">
+                            <span class="sensor-label">⚡ Energy</span>
+                            <span class="sensor-value good">${b.energy} kWh</span>
+                        </div>
+                        <div class="sensor-row">
+                            <span class="sensor-label">💨 Air Quality</span>
+                            <span class="sensor-value ${aqiClass}">AQI ${b.aqi}</span>
+                        </div>
+                        <div class="sensor-row">
+                            <span class="sensor-label">🔒 Security</span>
+                            <span class="sensor-value ${b.unauthorized > 0 ? 'danger' : 'good'}">${b.unauthorized > 0 ? b.unauthorized + ' alerts' : 'All Clear'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update alerts
+            const alertsList = document.getElementById('alertsList');
+            if (alerts.length === 0) {
+                alertsList.innerHTML = '<div class="alert-item success">✅ No active alerts — all systems normal</div>';
+            } else {
+                alertsList.innerHTML = alerts.map(a => `<div class="alert-item ${a.type}">${a.msg}</div>`).join('');
+            }
+
+            // Update timestamp
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        }
+
+        // Update every 5 seconds
+        updateDashboard();
+        setInterval(updateDashboard, 5000);
+    </script>
+
+</body>
+</html>
