@@ -4,6 +4,8 @@ A production-grade smart building DevOps platform built on **Microsoft Azure** �
 
 🌐 **Live Dashboard:** [https://iot-building-dashboard.vercel.app](https://iot-building-dashboard.vercel.app)
 
+![Dashboard Screenshot](docs/dashboard-screenshot.png)
+
 ---
 
 ## 🎯 What This Project Does
