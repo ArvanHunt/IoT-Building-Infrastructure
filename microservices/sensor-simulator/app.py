@@ -2,7 +2,9 @@ import time
 import random
 import json
 import logging
+import threading
 from datetime import datetime
+from flask import Flask, jsonify
 
 # Configure logging
 logging.basicConfig(
@@ -11,6 +13,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Flask app for health check
+app = Flask(__name__)
+
 # Building configurations
 BUILDINGS = [
     {"id": "building-001", "name": "Tower A", "floors": 10},
@@ -18,8 +23,18 @@ BUILDINGS = [
     {"id": "building-003", "name": "Tower C", "floors": 15},
 ]
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy", "service": "sensor-simulator"}), 200
+
+@app.route('/metrics')
+def metrics():
+    data = []
+    for building in BUILDINGS:
+        data.append(generate_sensor_data(building))
+    return jsonify(data), 200
+
 def generate_sensor_data(building):
-    """Generate realistic IoT sensor data for a building"""
     return {
         "building_id": building["id"],
         "building_name": building["name"],
@@ -54,7 +69,6 @@ def generate_sensor_data(building):
     }
 
 def simulate_sensors():
-    """Main simulation loop"""
     logger.info("Starting IoT Building Sensor Simulator...")
     logger.info(f"Monitoring {len(BUILDINGS)} buildings")
 
@@ -67,7 +81,6 @@ def simulate_sensors():
                        f"Energy: {data['sensors']['energy_consumption']['value']} kWh | "
                        f"AQI: {data['sensors']['air_quality']['value']}")
 
-            # Check for anomalies
             if data['sensors']['temperature']['value'] > 26.0:
                 logger.warning(f"HIGH TEMPERATURE ALERT: {data['building_name']} - "
                               f"{data['sensors']['temperature']['value']}°C")
@@ -82,7 +95,13 @@ def simulate_sensors():
                               f"{data['sensors']['access_events']['unauthorized_attempts']}")
 
         logger.info("---")
-        time.sleep(5)  # Send data every 5 seconds
+        time.sleep(5)
 
 if __name__ == "__main__":
-    simulate_sensors()
+    # Run sensor simulation in background thread
+    sensor_thread = threading.Thread(target=simulate_sensors, daemon=True)
+    sensor_thread.start()
+
+    # Run Flask app
+    logger.info("Starting HTTP server on port 8080...")
+    app.run(host='0.0.0.0', port=8080)

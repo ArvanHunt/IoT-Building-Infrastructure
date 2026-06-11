@@ -1,0 +1,50 @@
+# Uptime Kuma Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uptime-kuma
+  namespace: monitoring
+  labels:
+    app: uptime-kuma
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma
+    spec:
+      containers:
+      - name: uptime-kuma
+        image: louislam/uptime-kuma:1
+        ports:
+        - containerPort: 3001
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: uptime-kuma-data
+          mountPath: /app/data
+      volumes:
+      - name: uptime-kuma-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uptime-kuma-service
+  namespace: monitoring
+spec:
+  selector:
+    app: uptime-kuma
+  ports:
+  - protocol: TCP
+    port: 3001
+    targetPort: 3001
+  type: ClusterIP
