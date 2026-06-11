@@ -1,0 +1,41 @@
+# Prometheus Stack Configuration
+grafana:
+  enabled: true
+  adminPassword: "iotbuilding@2024"
+  
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+  persistence:
+    enabled: false
+
+prometheus:
+  enabled: true
+  prometheusSpec:
+    retention: 10d
+    resources:
+      requests:
+        memory: 400Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+
+alertmanager:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
