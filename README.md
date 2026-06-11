@@ -205,12 +205,9 @@ The IoT simulator generates realistic building data every 5 seconds:
 
 ---
 
-## 🌐 Live Dashboard
+🌐 **Live Dashboard:** [https://iot-building-dashboard.vercel.app](https://iot-building-dashboard.vercel.app)
 
-Visit the live dashboard:
-👉 **[https://iot-building-dashboard.vercel.app](https://iot-building-dashboard.vercel.app)**
-
-        ![Dashboard Screenshot](docs/dashboard-screenshot.png)
+![Dashboard Screenshot](docs/dashboard-screenshot.png)
 
 Features:
 - Real-time KPI strip
