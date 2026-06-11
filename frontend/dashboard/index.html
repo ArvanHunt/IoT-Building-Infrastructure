@@ -3,407 +3,1221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Building Infrastructure Dashboard</title>
+    <title>SmartOps — Building Intelligence Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #080c14;
+            --bg-secondary: #0d1421;
+            --bg-card: #111827;
+            --bg-card-hover: #161f30;
+            --border: #1e2d42;
+            --border-active: #2563eb;
+            --accent-blue: #2563eb;
+            --accent-blue-light: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --font-display: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f1117;
-            color: #ffffff;
+            font-family: var(--font-display);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        header {
-            background: #1a1d2e;
-            padding: 20px 40px;
+        /* TOP NAV */
+        nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 60px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #2d2f3e;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
         }
 
-        header h1 {
-            font-size: 24px;
-            color: #00d4ff;
-        }
-
-        .status-badge {
-            background: #00ff88;
-            color: #000;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .container {
-            padding: 30px 40px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: #1a1d2e;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #2d2f3e;
-        }
-
-        .stat-card .label {
-            font-size: 13px;
-            color: #8b8d9b;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #00d4ff;
-        }
-
-        .stat-card .unit {
-            font-size: 13px;
-            color: #8b8d9b;
-            margin-top: 4px;
-        }
-
-        .buildings-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .building-card {
-            background: #1a1d2e;
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #2d2f3e;
-        }
-
-        .building-card h3 {
-            font-size: 18px;
-            margin-bottom: 16px;
-            color: #ffffff;
+        .nav-brand {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .building-status {
-            width: 10px;
-            height: 10px;
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .nav-title span {
+            color: var(--accent-blue-light);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--accent-green);
+            font-family: var(--font-mono);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: #00ff88;
-            display: inline-block;
+            background: var(--accent-green);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
         }
 
-        .sensor-row {
+        .nav-time {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* SIDEBAR */
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        aside {
+            width: 220px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 24px 0;
+            flex-shrink: 0;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+            border-left: 2px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--text-primary);
+        }
+
+        .sidebar-item.active {
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--accent-blue-light);
+            border-left-color: var(--accent-blue);
+        }
+
+        .sidebar-item .icon { font-size: 15px; }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            padding: 28px 32px;
+            overflow-y: auto;
+        }
+
+        .page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #2d2f3e;
+            align-items: flex-start;
+            margin-bottom: 28px;
         }
 
-        .sensor-row:last-child {
-            border-bottom: none;
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
         }
 
-        .sensor-label {
+        .page-subtitle {
             font-size: 13px;
-            color: #8b8d9b;
+            color: var(--text-secondary);
+            margin-top: 4px;
         }
 
-        .sensor-value {
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffffff;
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
-        .sensor-value.warning {
-            color: #ffaa00;
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
         }
 
-        .sensor-value.danger {
-            color: #ff4444;
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
         }
 
-        .sensor-value.good {
-            color: #00ff88;
+        .btn-primary:hover { background: var(--accent-blue-light); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
         }
 
-        .alerts-section {
-            background: #1a1d2e;
+        .btn-ghost:hover {
+            border-color: var(--border-active);
+            color: var(--text-primary);
+        }
+
+        /* KPI STRIP */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #2d2f3e;
-            margin-bottom: 30px;
+            padding: 18px;
+            transition: border-color 0.2s;
         }
 
-        .alerts-section h2 {
-            font-size: 18px;
-            margin-bottom: 16px;
-            color: #ffffff;
+        .kpi-card:hover { border-color: var(--border-active); }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
 
-        .alert-item {
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .kpi-value.blue { color: var(--accent-blue-light); }
+        .kpi-value.green { color: var(--accent-green); }
+        .kpi-value.cyan { color: var(--accent-cyan); }
+        .kpi-value.yellow { color: var(--accent-yellow); }
+
+        .kpi-delta {
+            font-size: 11px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 14px;
+            gap: 4px;
         }
 
-        .alert-item.warning {
-            background: rgba(255, 170, 0, 0.1);
-            border: 1px solid rgba(255, 170, 0, 0.3);
-            color: #ffaa00;
+        .kpi-delta.up { color: var(--accent-green); }
+        .kpi-delta.down { color: var(--accent-red); }
+        .kpi-delta.neutral { color: var(--text-muted); }
+
+        /* GRID LAYOUT */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .alert-item.danger {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            color: #ff4444;
-        }
-
-        .alert-item.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: #00ff88;
-        }
-
-        .infrastructure-grid {
+        .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .infra-card {
-            background: #1a1d2e;
+        .grid-1-2 {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #2d2f3e;
-            text-align: center;
+            overflow: hidden;
         }
 
-        .infra-card .icon {
-            font-size: 32px;
-            margin-bottom: 12px;
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .infra-card .name {
-            font-size: 14px;
-            color: #8b8d9b;
-            margin-bottom: 8px;
-        }
-
-        .infra-card .status {
+        .card-title {
             font-size: 13px;
-            font-weight: bold;
-            color: #00ff88;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .section-title {
-            font-size: 18px;
+        .card-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+        }
+
+        .badge-green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .badge-yellow { background: rgba(245,158,11,0.15); color: var(--accent-yellow); }
+        .badge-red { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .badge-blue { background: rgba(37,99,235,0.15); color: var(--accent-blue-light); }
+        .badge-muted { background: rgba(71,85,105,0.3); color: var(--text-muted); }
+
+        .card-body { padding: 20px; }
+
+        /* BUILDING CARDS */
+        .building-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 16px;
-            color: #ffffff;
         }
 
-        .last-updated {
+        .building-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .building-id {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            margin-top: 2px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(30, 45, 66, 0.6);
+        }
+
+        .metric-row:last-child { border-bottom: none; }
+
+        .metric-name {
             font-size: 12px;
-            color: #8b8d9b;
-            text-align: right;
-            margin-top: 20px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metric-val {
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .metric-val.ok { color: var(--accent-green); }
+        .metric-val.warn { color: var(--accent-yellow); }
+        .metric-val.crit { color: var(--accent-red); }
+        .metric-val.info { color: var(--accent-cyan); }
+
+        /* SPARKLINE */
+        .sparkline-wrap {
+            margin-top: 14px;
+            height: 40px;
+        }
+
+        canvas.sparkline {
+            width: 100%;
+            height: 40px;
+        }
+
+        /* ALERTS */
+        .alert-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .alert-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid transparent;
+        }
+
+        .alert-row.crit {
+            background: rgba(239,68,68,0.07);
+            border-color: rgba(239,68,68,0.2);
+        }
+
+        .alert-row.warn {
+            background: rgba(245,158,11,0.07);
+            border-color: rgba(245,158,11,0.2);
+        }
+
+        .alert-row.info {
+            background: rgba(6,182,212,0.07);
+            border-color: rgba(6,182,212,0.2);
+        }
+
+        .alert-row.ok {
+            background: rgba(16,185,129,0.07);
+            border-color: rgba(16,185,129,0.2);
+        }
+
+        .alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+        .alert-content { flex: 1; }
+
+        .alert-msg { font-weight: 500; margin-bottom: 2px; }
+
+        .alert-row.crit .alert-msg { color: var(--accent-red); }
+        .alert-row.warn .alert-msg { color: var(--accent-yellow); }
+        .alert-row.info .alert-msg { color: var(--accent-cyan); }
+        .alert-row.ok .alert-msg { color: var(--accent-green); }
+
+        .alert-time {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* INFRA STATUS */
+        .infra-list { display: flex; flex-direction: column; gap: 2px; }
+
+        .infra-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 12px;
+            border-radius: 7px;
+            transition: background 0.15s;
+        }
+
+        .infra-row:hover { background: var(--bg-card-hover); }
+
+        .infra-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .infra-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            background: rgba(37,99,235,0.12);
+        }
+
+        .infra-name { font-weight: 500; font-size: 12px; }
+        .infra-sub { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+
+        .infra-status {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .infra-status.up { color: var(--accent-green); }
+        .infra-status.warn { color: var(--accent-yellow); }
+
+        /* CHART BARS */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 80px;
+            padding-top: 8px;
+        }
+
+        .bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 100%;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            min-height: 4px;
+        }
+
+        .bar-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* ACCESS LOG */
+        .access-log { display: flex; flex-direction: column; gap: 0; }
+
+        .access-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(30,45,66,0.5);
+            font-size: 12px;
+        }
+
+        .access-row:last-child { border-bottom: none; }
+
+        .access-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .access-dot.granted { background: var(--accent-green); }
+        .access-dot.denied { background: var(--accent-red); }
+
+        .access-location { flex: 1; color: var(--text-secondary); }
+        .access-person { color: var(--text-primary); font-weight: 500; }
+
+        .access-time {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* ENERGY RING */
+        .energy-ring-wrap {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ring-canvas { flex-shrink: 0; }
+
+        .energy-breakdown { flex: 1; }
+
+        .energy-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+
+        .energy-dot-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .energy-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .energy-pct {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* FOOTER STRIP */
+        .footer-strip {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 10px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+            aside { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-1-2 { grid-template-columns: 1fr; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            main { padding: 16px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🏢 IoT Building Infrastructure Dashboard</h1>
-        <span class="status-badge">● All Systems Operational</span>
-    </header>
+<!-- TOP NAV -->
+<nav>
+    <div class="nav-brand">
+        <div class="nav-logo">🏢</div>
+        <div class="nav-title">Smart<span>Ops</span></div>
+    </div>
+    <div class="nav-right">
+        <div class="nav-status">
+            <div class="status-dot"></div>
+            <span>All systems operational</span>
+        </div>
+        <div class="nav-time" id="navTime">--:--:--</div>
+    </div>
+</nav>
 
-    <div class="container">
+<div class="layout">
 
-        <!-- Stats Overview -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="label">Total Buildings</div>
-                <div class="value">3</div>
-                <div class="unit">Active</div>
+<!-- SIDEBAR -->
+<aside>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Overview</div>
+        <div class="sidebar-item active"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">🏢</span> Buildings</div>
+        <div class="sidebar-item"><span class="icon">📡</span> Sensors</div>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Operations</div>
+        <div class="sidebar-item"><span class="icon">🔐</span> Access Control</div>
+        <div class="sidebar-item"><span class="icon">⚡</span> Energy</div>
+        <div class="sidebar-item"><span class="icon">🌡️</span> Environment</div>
+        <div class="sidebar-item"><span class="icon">🔔</span> Alerts</div>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Infrastructure</div>
+        <div class="sidebar-item"><span class="icon">☸️</span> Kubernetes</div>
+        <div class="sidebar-item"><span class="icon">📈</span> Monitoring</div>
+        <div class="sidebar-item"><span class="icon">🔒</span> Security</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <div class="page-title">Platform Overview</div>
+            <div class="page-subtitle">Real-time monitoring across all buildings and infrastructure</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-ghost">Export Report</button>
+            <button class="btn btn-primary">+ Add Building</button>
+        </div>
+    </div>
+
+    <!-- KPI STRIP -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Active Buildings</div>
+            <div class="kpi-value blue">3</div>
+            <div class="kpi-delta up">↑ All online</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Total Occupancy</div>
+            <div class="kpi-value green" id="kpiOccupancy">—</div>
+            <div class="kpi-delta neutral" id="kpiOccupancyDelta">people across buildings</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Avg Temperature</div>
+            <div class="kpi-value cyan" id="kpiTemp">—</div>
+            <div class="kpi-delta neutral">°C fleet average</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Energy Load</div>
+            <div class="kpi-value yellow" id="kpiEnergy">—</div>
+            <div class="kpi-delta neutral">kWh combined</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Active Alerts</div>
+            <div class="kpi-value" id="kpiAlerts" style="color:#ef4444">—</div>
+            <div class="kpi-delta" id="kpiAlertsDelta">requires attention</div>
+        </div>
+    </div>
+
+    <!-- BUILDING CARDS -->
+    <div class="grid-3">
+        <div class="card" id="buildingCard0">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Tower A</div>
+                    <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px">BLD-001 · 10 floors</div>
+                </div>
+                <span class="card-badge badge-green" id="b0badge">ONLINE</span>
             </div>
-            <div class="stat-card">
-                <div class="label">Total Occupancy</div>
-                <div class="value" id="totalOccupancy">--</div>
-                <div class="unit">People</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Avg Temperature</div>
-                <div class="value" id="avgTemp">--</div>
-                <div class="unit">°Celsius</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Total Energy</div>
-                <div class="value" id="totalEnergy">--</div>
-                <div class="unit">kWh</div>
+            <div class="card-body">
+                <div class="metric-row">
+                    <span class="metric-name">🌡️ Temperature</span>
+                    <span class="metric-val" id="b0temp">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">👥 Occupancy</span>
+                    <span class="metric-val info" id="b0occ">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">⚡ Energy</span>
+                    <span class="metric-val ok" id="b0energy">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">💨 Air Quality</span>
+                    <span class="metric-val" id="b0aqi">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">🔒 Security</span>
+                    <span class="metric-val" id="b0sec">—</span>
+                </div>
+                <div class="sparkline-wrap">
+                    <canvas class="sparkline" id="spark0"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Building Cards -->
-        <h2 class="section-title">🏗️ Building Status</h2>
-        <div class="buildings-grid" id="buildingsGrid">
-            <!-- Buildings will be loaded here -->
-        </div>
-
-        <!-- Alerts -->
-        <div class="alerts-section">
-            <h2>🔔 Active Alerts</h2>
-            <div id="alertsList">
-                <!-- Alerts will be loaded here -->
+        <div class="card" id="buildingCard1">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Tower B</div>
+                    <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px">BLD-002 · 8 floors</div>
+                </div>
+                <span class="card-badge badge-green" id="b1badge">ONLINE</span>
+            </div>
+            <div class="card-body">
+                <div class="metric-row">
+                    <span class="metric-name">🌡️ Temperature</span>
+                    <span class="metric-val" id="b1temp">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">👥 Occupancy</span>
+                    <span class="metric-val info" id="b1occ">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">⚡ Energy</span>
+                    <span class="metric-val ok" id="b1energy">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">💨 Air Quality</span>
+                    <span class="metric-val" id="b1aqi">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">🔒 Security</span>
+                    <span class="metric-val" id="b1sec">—</span>
+                </div>
+                <div class="sparkline-wrap">
+                    <canvas class="sparkline" id="spark1"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Infrastructure Status -->
-        <h2 class="section-title">☁️ Infrastructure Status</h2>
-        <div class="infrastructure-grid">
-            <div class="infra-card">
-                <div class="icon">☸️</div>
-                <div class="name">AKS Cluster</div>
-                <div class="status">● Running</div>
+        <div class="card" id="buildingCard2">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Tower C</div>
+                    <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px">BLD-003 · 15 floors</div>
+                </div>
+                <span class="card-badge badge-green" id="b2badge">ONLINE</span>
             </div>
-            <div class="infra-card">
-                <div class="icon">📦</div>
-                <div class="name">Container Registry</div>
-                <div class="status">● Active</div>
+            <div class="card-body">
+                <div class="metric-row">
+                    <span class="metric-name">🌡️ Temperature</span>
+                    <span class="metric-val" id="b2temp">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">👥 Occupancy</span>
+                    <span class="metric-val info" id="b2occ">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">⚡ Energy</span>
+                    <span class="metric-val ok" id="b2energy">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">💨 Air Quality</span>
+                    <span class="metric-val" id="b2aqi">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-name">🔒 Security</span>
+                    <span class="metric-val" id="b2sec">—</span>
+                </div>
+                <div class="sparkline-wrap">
+                    <canvas class="sparkline" id="spark2"></canvas>
+                </div>
             </div>
-            <div class="infra-card">
-                <div class="icon">🔐</div>
-                <div class="name">Key Vault</div>
-                <div class="status">● Secured</div>
+        </div>
+    </div>
+
+    <!-- ALERTS + ACCESS LOG -->
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🔔 Active Alerts</div>
+                <span class="card-badge badge-red" id="alertCount">0</span>
             </div>
-            <div class="infra-card">
-                <div class="icon">📊</div>
-                <div class="name">Prometheus</div>
-                <div class="status">● Collecting</div>
-            </div>
-            <div class="infra-card">
-                <div class="icon">📈</div>
-                <div class="name">Grafana</div>
-                <div class="status">● Live</div>
-            </div>
-            <div class="infra-card">
-                <div class="icon">⏱️</div>
-                <div class="name">Uptime Kuma</div>
-                <div class="status">● Monitoring</div>
+            <div class="card-body">
+                <div class="alert-list" id="alertList">
+                    <div class="alert-row ok">
+                        <span class="alert-icon">✅</span>
+                        <div class="alert-content">
+                            <div class="alert-msg">No active alerts</div>
+                            <div class="alert-time">All systems normal</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="last-updated">Last updated: <span id="lastUpdated">--</span></div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🚪 Access Log</div>
+                <span class="card-badge badge-muted">Live</span>
+            </div>
+            <div class="card-body">
+                <div class="access-log" id="accessLog">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENERGY + OCCUPANCY CHART + INFRA -->
+    <div class="grid-3">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">⚡ Energy Distribution</div>
+                <span class="card-badge badge-yellow" id="totalEnergyBadge">—kWh</span>
+            </div>
+            <div class="card-body">
+                <div class="energy-ring-wrap">
+                    <canvas id="ringCanvas" class="ring-canvas" width="100" height="100"></canvas>
+                    <div class="energy-breakdown" id="energyBreakdown"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">👥 Occupancy Trend</div>
+                <span class="card-badge badge-blue">Last 8 intervals</span>
+            </div>
+            <div class="card-body">
+                <div class="bar-chart" id="occChart"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">☁️ Infrastructure</div>
+                <span class="card-badge badge-green">6/6 healthy</span>
+            </div>
+            <div class="card-body" style="padding: 8px 12px;">
+                <div class="infra-list">
+                    <div class="infra-row">
+                        <div class="infra-left">
+                            <div class="infra-icon">☸️</div>
+                            <div>
+                                <div class="infra-name">AKS Cluster</div>
+                                <div class="infra-sub">iotbuilding-aks · 1 node</div>
+                            </div>
+                        </div>
+                        <div class="infra-status up">● Running</div>
+                    </div>
+                    <div class="infra-row">
+                        <div class="infra-left">
+                            <div class="infra-icon">📦</div>
+                            <div>
+                                <div class="infra-name">Container Registry</div>
+                                <div class="infra-sub">iotbuildingregistry.azurecr.io</div>
+                            </div>
+                        </div>
+                        <div class="infra-status up">● Active</div>
+                    </div>
+                    <div class="infra-row">
+                        <div class="infra-left">
+                            <div class="infra-icon">🔐</div>
+                            <div>
+                                <div class="infra-name">Key Vault</div>
+                                <div class="infra-sub">iotbuilding-kv · 0 expiring</div>
+                            </div>
+                        </div>
+                        <div class="infra-status up">● Secured</div>
+                    </div>
+                    <div class="infra-row">
+                        <div class="infra-left">
+                            <div class="infra-icon">📊</div>
+                            <div>
+                                <div class="infra-name">Prometheus</div>
+                                <div class="infra-sub">monitoring namespace</div>
+                            </div>
+                        </div>
+                        <div class="infra-status up">● Scraping</div>
+                    </div>
+                    <div class="infra-row">
+                        <div class="infra-left">
+                            <div class="infra-icon">📈</div>
+                            <div>
+                                <div class="infra-name">Grafana</div>
+                                <div class="infra-sub">port-forward :3000</div>
+                            </div>
+                        </div>
+                        <div class="infra-status up">● Live</div>
+                    </div>
+                    <div class="infra-row">
+                        <div class="infra-left">
+                            <div class="infra-icon">⏱️</div>
+                            <div>
+                                <div class="infra-name">Uptime Kuma</div>
+                                <div class="infra-sub">port-forward :3001</div>
+                            </div>
+                        </div>
+                        <div class="infra-status up">● Watching</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
-    <script>
-        // Simulate building data
-        const buildings = [
-            { id: "building-001", name: "Tower A", floors: 10 },
-            { id: "building-002", name: "Tower B", floors: 8 },
-            { id: "building-003", name: "Tower C", floors: 15 }
-        ];
+</main>
+</div>
 
-        function generateData() {
-            return buildings.map(b => ({
-                ...b,
-                temperature: (Math.random() * 10 + 18).toFixed(1),
-                occupancy: Math.floor(Math.random() * b.floors * 20),
-                energy: (Math.random() * 400 + 100).toFixed(1),
-                aqi: Math.floor(Math.random() * 100),
-                unauthorized: Math.floor(Math.random() * 3)
-            }));
-        }
+<!-- FOOTER -->
+<div class="footer-strip">
+    <span>SmartOps Platform · IoT Building Infrastructure</span>
+    <span id="footerTime">Refreshing every 5s</span>
+</div>
 
-        function updateDashboard() {
-            const data = generateData();
-            const alerts = [];
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
 
-            // Update stats
-            const totalOccupancy = data.reduce((a, b) => a + b.occupancy, 0);
-            const avgTemp = (data.reduce((a, b) => a + parseFloat(b.temperature), 0) / data.length).toFixed(1);
-            const totalEnergy = data.reduce((a, b) => a + parseFloat(b.energy), 0).toFixed(0);
+const BUILDINGS = [
+    { id: 'BLD-001', name: 'Tower A', floors: 10 },
+    { id: 'BLD-002', name: 'Tower B', floors: 8 },
+    { id: 'BLD-003', name: 'Tower C', floors: 15 },
+];
 
-            document.getElementById('totalOccupancy').textContent = totalOccupancy;
-            document.getElementById('avgTemp').textContent = avgTemp;
-            document.getElementById('totalEnergy').textContent = totalEnergy;
+const NAMES = ['Alex R.', 'Sarah M.', 'James K.', 'Priya N.', 'Tom H.', 'Arvan K.', 'Lisa C.', 'Omar S.'];
+const FLOORS = ['Lobby', 'Floor 2', 'Floor 5', 'Floor 8', 'Rooftop', 'Parking B1', 'Conference L3'];
+const COLORS_RING = ['#3b82f6', '#06b6d4', '#10b981'];
+const COLORS_BAR = ['#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a', '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa'];
 
-            // Update buildings
-            const grid = document.getElementById('buildingsGrid');
-            grid.innerHTML = data.map(b => {
-                const tempClass = b.temperature > 26 ? 'danger' : b.temperature > 24 ? 'warning' : 'good';
-                const aqiClass = b.aqi > 80 ? 'danger' : b.aqi > 50 ? 'warning' : 'good';
+// Sparkline history per building
+const sparkHistory = [[], [], []];
 
-                if (b.temperature > 26) alerts.push({ type: 'warning', msg: `🌡️ High Temperature: ${b.name} - ${b.temperature}°C` });
-                if (b.aqi > 80) alerts.push({ type: 'danger', msg: `😷 Poor Air Quality: ${b.name} - AQI ${b.aqi}` });
-                if (b.unauthorized > 0) alerts.push({ type: 'danger', msg: `🚨 Security Alert: ${b.name} - ${b.unauthorized} unauthorized attempt(s)` });
+// Occupancy trend
+const occHistory = Array(8).fill(0);
 
-                return `
-                    <div class="building-card">
-                        <h3><span class="building-status"></span>${b.name}</h3>
-                        <div class="sensor-row">
-                            <span class="sensor-label">🌡️ Temperature</span>
-                            <span class="sensor-value ${tempClass}">${b.temperature}°C</span>
-                        </div>
-                        <div class="sensor-row">
-                            <span class="sensor-label">👥 Occupancy</span>
-                            <span class="sensor-value good">${b.occupancy} people</span>
-                        </div>
-                        <div class="sensor-row">
-                            <span class="sensor-label">⚡ Energy</span>
-                            <span class="sensor-value good">${b.energy} kWh</span>
-                        </div>
-                        <div class="sensor-row">
-                            <span class="sensor-label">💨 Air Quality</span>
-                            <span class="sensor-value ${aqiClass}">AQI ${b.aqi}</span>
-                        </div>
-                        <div class="sensor-row">
-                            <span class="sensor-label">🔒 Security</span>
-                            <span class="sensor-value ${b.unauthorized > 0 ? 'danger' : 'good'}">${b.unauthorized > 0 ? b.unauthorized + ' alerts' : 'All Clear'}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+// Access log entries
+let accessEntries = [];
 
-            // Update alerts
-            const alertsList = document.getElementById('alertsList');
-            if (alerts.length === 0) {
-                alertsList.innerHTML = '<div class="alert-item success">✅ No active alerts — all systems normal</div>';
-            } else {
-                alertsList.innerHTML = alerts.map(a => `<div class="alert-item ${a.type}">${a.msg}</div>`).join('');
-            }
+// ─── GENERATORS ─────────────────────────────────────────────────────────────
 
-            // Update timestamp
-            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-        }
+function rnd(min, max) { return Math.random() * (max - min) + min; }
+function rndInt(min, max) { return Math.floor(rnd(min, max)); }
 
-        // Update every 5 seconds
-        updateDashboard();
-        setInterval(updateDashboard, 5000);
-    </script>
+function generateBuilding(b) {
+    const temp = rnd(17, 30);
+    const occ = rndInt(0, b.floors * 20);
+    const energy = rnd(80, 520);
+    const aqi = rndInt(0, 100);
+    const unauth = rndInt(0, 3);
+    return { ...b, temp, occ, energy, aqi, unauth };
+}
 
+function generateAccess() {
+    return {
+        granted: Math.random() > 0.15,
+        person: NAMES[rndInt(0, NAMES.length)],
+        location: FLOORS[rndInt(0, FLOORS.length)],
+        building: BUILDINGS[rndInt(0, 3)].name,
+        time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    };
+}
+
+// ─── CLOCK ──────────────────────────────────────────────────────────────────
+
+function updateClock() {
+    const t = new Date().toLocaleTimeString('en-GB');
+    document.getElementById('navTime').textContent = t;
+    document.getElementById('footerTime').textContent = `Last refresh: ${t}`;
+}
+
+// ─── SPARKLINE ──────────────────────────────────────────────────────────────
+
+function drawSparkline(canvasId, history, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.offsetWidth || 200;
+    const h = 40;
+    canvas.width = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+    if (history.length < 2) return;
+    const min = Math.min(...history);
+    const max = Math.max(...history);
+    const range = max - min || 1;
+    const step = w / (history.length - 1);
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 4;
+    history.forEach((v, i) => {
+        const x = i * step;
+        const y = h - ((v - min) / range) * (h - 6) - 3;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // Fill
+    ctx.beginPath();
+    history.forEach((v, i) => {
+        const x = i * step;
+        const y = h - ((v - min) / range) * (h - 6) - 3;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo((history.length - 1) * step, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fillStyle = color + '22';
+    ctx.fill();
+}
+
+// ─── RING CHART ─────────────────────────────────────────────────────────────
+
+function drawRing(energies) {
+    const canvas = document.getElementById('ringCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = 50, cy = 50, r = 38, lw = 14;
+    ctx.clearRect(0, 0, 100, 100);
+    const total = energies.reduce((a, b) => a + b, 0);
+    let start = -Math.PI / 2;
+    energies.forEach((v, i) => {
+        const slice = (v / total) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, start, start + slice);
+        ctx.strokeStyle = COLORS_RING[i];
+        ctx.lineWidth = lw;
+        ctx.stroke();
+        start += slice;
+    });
+    // Center
+    ctx.fillStyle = '#f1f5f9';
+    ctx.font = 'bold 11px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(Math.round(total) + '', cx, cy - 6);
+    ctx.font = '9px Inter, sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText('kWh', cx, cy + 8);
+}
+
+// ─── BAR CHART ──────────────────────────────────────────────────────────────
+
+function drawBars(history) {
+    const container = document.getElementById('occChart');
+    if (!container) return;
+    const max = Math.max(...history, 1);
+    container.innerHTML = history.map((v, i) => `
+        <div class="bar-wrap">
+            <div class="bar" style="height:${Math.max((v/max)*68, 4)}px;background:${COLORS_BAR[i]};opacity:${0.5 + (i/history.length)*0.5}"></div>
+            <div class="bar-label">${['T-7','T-6','T-5','T-4','T-3','T-2','T-1','Now'][i]}</div>
+        </div>
+    `).join('');
+}
+
+// ─── ACCESS LOG ─────────────────────────────────────────────────────────────
+
+function updateAccessLog() {
+    const entry = generateAccess();
+    accessEntries.unshift(entry);
+    if (accessEntries.length > 6) accessEntries.pop();
+    const container = document.getElementById('accessLog');
+    container.innerHTML = accessEntries.map(e => `
+        <div class="access-row">
+            <div class="access-dot ${e.granted ? 'granted' : 'denied'}"></div>
+            <div class="access-location">${e.location} · ${e.building}</div>
+            <div class="access-person">${e.person}</div>
+            <div class="access-time">${e.time}</div>
+        </div>
+    `).join('');
+}
+
+// ─── MAIN UPDATE ────────────────────────────────────────────────────────────
+
+function update() {
+    const data = BUILDINGS.map(generateBuilding);
+    const alerts = [];
+
+    // Update building cards
+    data.forEach((b, i) => {
+        // Sparkline
+        sparkHistory[i].push(b.temp);
+        if (sparkHistory[i].length > 20) sparkHistory[i].shift();
+
+        const tempClass = b.temp > 26 ? 'crit' : b.temp > 24 ? 'warn' : 'ok';
+        const aqiClass = b.aqi > 80 ? 'crit' : b.aqi > 50 ? 'warn' : 'ok';
+        const secClass = b.unauth > 0 ? 'crit' : 'ok';
+
+        const el = (id) => document.getElementById(id);
+        el(`b${i}temp`).textContent = `${b.temp.toFixed(1)}°C`;
+        el(`b${i}temp`).className = `metric-val ${tempClass}`;
+        el(`b${i}occ`).textContent = `${b.occ} people`;
+        el(`b${i}energy`).textContent = `${b.energy.toFixed(0)} kWh`;
+        el(`b${i}aqi`).textContent = `AQI ${b.aqi}`;
+        el(`b${i}aqi`).className = `metric-val ${aqiClass}`;
+        el(`b${i}sec`).textContent = b.unauth > 0 ? `${b.unauth} alert${b.unauth > 1 ? 's' : ''}` : 'Clear';
+        el(`b${i}sec`).className = `metric-val ${secClass}`;
+
+        drawSparkline(`spark${i}`, sparkHistory[i], COLORS_RING[i]);
+
+        // Collect alerts
+        if (b.temp > 26) alerts.push({ type: 'warn', icon: '🌡️', msg: `High temp: ${b.name} — ${b.temp.toFixed(1)}°C`, time: 'just now' });
+        if (b.aqi > 80) alerts.push({ type: 'crit', icon: '😷', msg: `Poor air quality: ${b.name} — AQI ${b.aqi}`, time: 'just now' });
+        if (b.unauth > 0) alerts.push({ type: 'crit', icon: '🚨', msg: `Unauthorized access: ${b.name} — ${b.unauth} attempt(s)`, time: 'just now' });
+    });
+
+    // KPIs
+    const totalOcc = data.reduce((a, b) => a + b.occ, 0);
+    const avgTemp = (data.reduce((a, b) => a + b.temp, 0) / data.length).toFixed(1);
+    const totalEnergy = data.reduce((a, b) => a + b.energy, 0);
+
+    document.getElementById('kpiOccupancy').textContent = totalOcc;
+    document.getElementById('kpiTemp').textContent = avgTemp;
+    document.getElementById('kpiEnergy').textContent = Math.round(totalEnergy);
+    document.getElementById('kpiAlerts').textContent = alerts.length;
+    document.getElementById('kpiAlertsDelta').textContent = alerts.length > 0 ? 'requires attention' : 'all clear';
+    document.getElementById('kpiAlertsDelta').style.color = alerts.length > 0 ? 'var(--accent-red)' : 'var(--accent-green)';
+
+    // Alert list
+    const alertEl = document.getElementById('alertList');
+    document.getElementById('alertCount').textContent = alerts.length;
+    document.getElementById('alertCount').className = `card-badge ${alerts.length > 0 ? 'badge-red' : 'badge-green'}`;
+    if (alerts.length === 0) {
+        alertEl.innerHTML = '<div class="alert-row ok"><span class="alert-icon">✅</span><div class="alert-content"><div class="alert-msg">No active alerts</div><div class="alert-time">All clear</div></div></div>';
+    } else {
+        alertEl.innerHTML = alerts.map(a => `
+            <div class="alert-row ${a.type}">
+                <span class="alert-icon">${a.icon}</span>
+                <div class="alert-content">
+                    <div class="alert-msg">${a.msg}</div>
+                    <div class="alert-time">${a.time}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Energy ring + breakdown
+    const energies = data.map(b => b.energy);
+    drawRing(energies);
+    document.getElementById('totalEnergyBadge').textContent = `${Math.round(totalEnergy)}kWh`;
+    document.getElementById('energyBreakdown').innerHTML = data.map((b, i) => `
+        <div class="energy-item">
+            <div class="energy-dot-label">
+                <div class="energy-dot" style="background:${COLORS_RING[i]}"></div>
+                <span>${b.name}</span>
+            </div>
+            <span class="energy-pct" style="color:${COLORS_RING[i]}">${Math.round(b.energy / totalEnergy * 100)}%</span>
+        </div>
+    `).join('');
+
+    // Occupancy trend
+    occHistory.shift();
+    occHistory.push(totalOcc);
+    drawBars(occHistory);
+
+    // Access log (every other tick)
+    updateAccessLog();
+
+    updateClock();
+}
+
+// ─── BOOT ────────────────────────────────────────────────────────────────────
+
+update();
+setInterval(update, 5000);
+setInterval(updateClock, 1000);
+</script>
 </body>
 </html>
