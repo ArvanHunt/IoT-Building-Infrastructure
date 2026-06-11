@@ -76,7 +76,7 @@ def simulate_sensors():
                 logger.warning(f"POOR AIR QUALITY ALERT: {data['building_name']} - "
                               f"AQI: {data['sensors']['air_quality']['value']}")
 
-            if data['sensors']['sensors']['access_events']['unauthorized_attempts'] > 0:
+            if data['sensors']['access_events']['unauthorized_attempts'] > 0:
                 logger.warning(f"SECURITY ALERT: {data['building_name']} - "
                               f"Unauthorized access attempts: "
                               f"{data['sensors']['access_events']['unauthorized_attempts']}")
